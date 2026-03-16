@@ -5,6 +5,12 @@ import { ArrowLeft, Trash2, Image as ImageIcon } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+// Parse date string as local date to avoid timezone shifts
+const parseLocalDate = (dateString) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 function RoundDetail({ isAuthenticated }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -84,7 +90,7 @@ function RoundDetail({ isAuthenticated }) {
         <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              {format(new Date(round.date), 'MMMM d, yyyy')}
+              {format(parseLocalDate(round.date), 'MMMM d, yyyy')}
             </h1>
             {round.course_name && (
               <p className="text-xl text-gray-600">{round.course_name}</p>

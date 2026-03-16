@@ -6,6 +6,12 @@ import Highlights from './Highlights';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+// Parse date string as local date to avoid timezone shifts
+const parseLocalDate = (dateString) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -130,7 +136,7 @@ function Dashboard() {
                 <h4 className="font-bold text-green-800 mb-2">Dad's Best 18</h4>
                 <p className="text-3xl font-bold text-green-600">{stats.bestDadScore18.dad_score}</p>
                 <p className="text-sm text-gray-600 mt-1">
-                  {format(new Date(stats.bestDadScore18.date), 'MMM d, yyyy')}
+                  {format(parseLocalDate(stats.bestDadScore18.date), 'MMM d, yyyy')}
                   {stats.bestDadScore18.course_name && ` • ${stats.bestDadScore18.course_name}`}
                 </p>
               </div>
@@ -140,7 +146,7 @@ function Dashboard() {
                 <h4 className="font-bold text-purple-800 mb-2">Ethan's Best 18</h4>
                 <p className="text-3xl font-bold text-purple-600">{stats.bestEthanScore18.ethan_score}</p>
                 <p className="text-sm text-gray-600 mt-1">
-                  {format(new Date(stats.bestEthanScore18.date), 'MMM d, yyyy')}
+                  {format(parseLocalDate(stats.bestEthanScore18.date), 'MMM d, yyyy')}
                   {stats.bestEthanScore18.course_name && ` • ${stats.bestEthanScore18.course_name}`}
                 </p>
               </div>
@@ -158,7 +164,7 @@ function Dashboard() {
                   <h4 className="font-bold text-green-800 mb-2">Dad's Best 9</h4>
                   <p className="text-3xl font-bold text-green-600">{stats.bestDadScore9.dad_score}</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    {format(new Date(stats.bestDadScore9.date), 'MMM d, yyyy')}
+                    {format(parseLocalDate(stats.bestDadScore9.date), 'MMM d, yyyy')}
                     {stats.bestDadScore9.course_name && ` • ${stats.bestDadScore9.course_name}`}
                   </p>
                 </div>
@@ -168,7 +174,7 @@ function Dashboard() {
                   <h4 className="font-bold text-purple-800 mb-2">Ethan's Best 9</h4>
                   <p className="text-3xl font-bold text-purple-600">{stats.bestEthanScore9.ethan_score}</p>
                   <p className="text-sm text-gray-600 mt-1">
-                    {format(new Date(stats.bestEthanScore9.date), 'MMM d, yyyy')}
+                    {format(parseLocalDate(stats.bestEthanScore9.date), 'MMM d, yyyy')}
                     {stats.bestEthanScore9.course_name && ` • ${stats.bestEthanScore9.course_name}`}
                   </p>
                 </div>
@@ -203,7 +209,7 @@ function Dashboard() {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-semibold text-gray-800">
-                      {format(new Date(round.date), 'MMMM d, yyyy')}
+                      {format(parseLocalDate(round.date), 'MMMM d, yyyy')}
                     </p>
                     {round.course_name && (
                       <p className="text-sm text-gray-600">{round.course_name}</p>

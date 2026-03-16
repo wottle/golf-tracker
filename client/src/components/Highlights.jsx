@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { Sparkles, TrendingUp, Award, Calendar, Zap, Trophy } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 
+// Parse date string as local date to avoid timezone shifts
+const parseLocalDate = (dateString) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 function Highlights({ highlights, stats }) {
   const [currentHighlight, setCurrentHighlight] = useState(null);
 
@@ -65,7 +71,7 @@ function Highlights({ highlights, stats }) {
     if (stats.firstEthanWin) {
       items.push({
         icon: <Award className="w-8 h-8" />,
-        text: `Remember when... ${formatDistanceToNow(new Date(stats.firstEthanWin.date), { addSuffix: true })}, Ethan beat his father for the first time! 🎉`,
+        text: `Remember when... ${formatDistanceToNow(parseLocalDate(stats.firstEthanWin.date), { addSuffix: true })}, Ethan beat his father for the first time! 🎉`,
         color: 'purple',
         type: 'milestone',
         priority: 8
@@ -74,7 +80,7 @@ function Highlights({ highlights, stats }) {
 
     // Biggest win (prioritize if Ethan won)
     if (highlights.biggestWin) {
-      const date = format(new Date(highlights.biggestWin.round.date), 'MMM d, yyyy');
+      const date = format(parseLocalDate(highlights.biggestWin.round.date), 'MMM d, yyyy');
       if (highlights.biggestWin.winner === 'ethan') {
         items.push({
           icon: <Zap className="w-8 h-8" />,
@@ -96,7 +102,7 @@ function Highlights({ highlights, stats }) {
 
     // Closest match
     if (highlights.closestMatch && highlights.closestMatch.margin <= 3) {
-      const date = format(new Date(highlights.closestMatch.round.date), 'MMM d, yyyy');
+      const date = format(parseLocalDate(highlights.closestMatch.round.date), 'MMM d, yyyy');
       items.push({
         icon: <Sparkles className="w-8 h-8" />,
         text: `Nail-biter! The closest match was decided by just ${highlights.closestMatch.margin} stroke${highlights.closestMatch.margin === 1 ? '' : 's'} on ${date}! 😱`,
@@ -109,7 +115,7 @@ function Highlights({ highlights, stats }) {
     // On this day (prioritize if Ethan won)
     if (highlights.onThisDay && highlights.onThisDay.length > 0) {
       const round = highlights.onThisDay[0];
-      const yearsAgo = new Date().getFullYear() - new Date(round.date).getFullYear();
+      const yearsAgo = new Date().getFullYear() - parseLocalDate(round.date).getFullYear();
       if (yearsAgo > 0) {
         const ethanWon = round.ethan_score < round.dad_score;
         const dadWon = round.dad_score < round.ethan_score;
@@ -146,7 +152,7 @@ function Highlights({ highlights, stats }) {
     if (stats.bestEthanScore) {
       items.push({
         icon: <Award className="w-8 h-8" />,
-        text: `Ethan's personal best: ${stats.bestEthanScore.ethan_score} on ${format(new Date(stats.bestEthanScore.date), 'MMM d, yyyy')}! ⭐`,
+        text: `Ethan's personal best: ${stats.bestEthanScore.ethan_score} on ${format(parseLocalDate(stats.bestEthanScore.date), 'MMM d, yyyy')}! ⭐`,
         color: 'purple',
         type: 'achievement',
         priority: 7
@@ -155,11 +161,11 @@ function Highlights({ highlights, stats }) {
 
     // First round ever
     if (highlights.firstRound && stats.totalRounds >= 5) {
-      const yearsAgo = new Date().getFullYear() - new Date(highlights.firstRound.date).getFullYear();
+      const yearsAgo = new Date().getFullYear() - parseLocalDate(highlights.firstRound.date).getFullYear();
       if (yearsAgo > 0) {
         items.push({
           icon: <Calendar className="w-8 h-8" />,
-          text: `It all started ${yearsAgo} year${yearsAgo === 1 ? '' : 's'} ago on ${format(new Date(highlights.firstRound.date), 'MMM d, yyyy')}! 🌟`,
+          text: `It all started ${yearsAgo} year${yearsAgo === 1 ? '' : 's'} ago on ${format(parseLocalDate(highlights.firstRound.date), 'MMM d, yyyy')}! 🌟`,
           color: 'cyan',
           type: 'milestone',
           priority: 6

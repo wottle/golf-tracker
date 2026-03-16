@@ -5,6 +5,12 @@ import { ArrowLeft, Trophy, Calendar } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+// Parse date string as local date to avoid timezone shifts
+const parseLocalDate = (dateString) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 function AllRounds() {
   const [rounds, setRounds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +84,7 @@ function AllRounds() {
                       <Calendar className="w-6 h-6 text-golf-green" />
                       <div>
                         <h3 className="text-xl font-bold text-gray-800">
-                          {format(new Date(round.date), 'MMMM d, yyyy')}
+                          {format(parseLocalDate(round.date), 'MMMM d, yyyy')}
                         </h3>
                         {round.course_name && (
                           <p className="text-gray-600">{round.course_name}</p>
