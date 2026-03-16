@@ -8,7 +8,6 @@ services:
       - "3001:3001"
     volumes:
       - ./uploads:/app/uploads
-      - ./golf-tracker.db:/app/golf-tracker.db
       - ./data:/app/data
     environment:
       - NODE_ENV=production

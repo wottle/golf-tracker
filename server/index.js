@@ -52,7 +52,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-const db = new sqlite3.Database('./golf-tracker.db', (err) => {
+// Ensure data directory exists
+const dataDir = './data';
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const db = new sqlite3.Database('./data/golf-tracker.db', (err) => {
   if (err) {
     console.error('Error opening database:', err);
   } else {
