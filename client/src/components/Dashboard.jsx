@@ -120,28 +120,62 @@ function Dashboard() {
           <TrendingDown className="w-8 h-8 text-golf-green" />
           <h2 className="text-2xl font-bold text-gray-800">Best Scores</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {stats.bestDadScore && (
-            <div className="bg-green-50 rounded-lg p-4 border-2 border-green-200">
-              <h3 className="font-bold text-green-800 mb-2">Dad's Best Round</h3>
-              <p className="text-3xl font-bold text-green-600">{stats.bestDadScore.dad_score}</p>
-              <p className="text-sm text-gray-600 mt-1">
-                {format(new Date(stats.bestDadScore.date), 'MMM d, yyyy')}
-                {stats.bestDadScore.course_name && ` • ${stats.bestDadScore.course_name}`}
-              </p>
-            </div>
-          )}
-          {stats.bestEthanScore && (
-            <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
-              <h3 className="font-bold text-purple-800 mb-2">Ethan's Best Round</h3>
-              <p className="text-3xl font-bold text-purple-600">{stats.bestEthanScore.ethan_score}</p>
-              <p className="text-sm text-gray-600 mt-1">
-                {format(new Date(stats.bestEthanScore.date), 'MMM d, yyyy')}
-                {stats.bestEthanScore.course_name && ` • ${stats.bestEthanScore.course_name}`}
-              </p>
-            </div>
-          )}
+        
+        {/* 18-Hole Best Scores */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-700 mb-3">18 Holes</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {stats.bestDadScore18 && (
+              <div className="bg-green-50 rounded-lg p-4 border-2 border-green-200">
+                <h4 className="font-bold text-green-800 mb-2">Dad's Best 18</h4>
+                <p className="text-3xl font-bold text-green-600">{stats.bestDadScore18.dad_score}</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {format(new Date(stats.bestDadScore18.date), 'MMM d, yyyy')}
+                  {stats.bestDadScore18.course_name && ` • ${stats.bestDadScore18.course_name}`}
+                </p>
+              </div>
+            )}
+            {stats.bestEthanScore18 && (
+              <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
+                <h4 className="font-bold text-purple-800 mb-2">Ethan's Best 18</h4>
+                <p className="text-3xl font-bold text-purple-600">{stats.bestEthanScore18.ethan_score}</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {format(new Date(stats.bestEthanScore18.date), 'MMM d, yyyy')}
+                  {stats.bestEthanScore18.course_name && ` • ${stats.bestEthanScore18.course_name}`}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* 9-Hole Best Scores */}
+        {(stats.bestDadScore9 || stats.bestEthanScore9) && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-3">9 Holes</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {stats.bestDadScore9 && (
+                <div className="bg-green-50 rounded-lg p-4 border-2 border-green-200">
+                  <h4 className="font-bold text-green-800 mb-2">Dad's Best 9</h4>
+                  <p className="text-3xl font-bold text-green-600">{stats.bestDadScore9.dad_score}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {format(new Date(stats.bestDadScore9.date), 'MMM d, yyyy')}
+                    {stats.bestDadScore9.course_name && ` • ${stats.bestDadScore9.course_name}`}
+                  </p>
+                </div>
+              )}
+              {stats.bestEthanScore9 && (
+                <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
+                  <h4 className="font-bold text-purple-800 mb-2">Ethan's Best 9</h4>
+                  <p className="text-3xl font-bold text-purple-600">{stats.bestEthanScore9.ethan_score}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {format(new Date(stats.bestEthanScore9.date), 'MMM d, yyyy')}
+                    {stats.bestEthanScore9.course_name && ` • ${stats.bestEthanScore9.course_name}`}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6">

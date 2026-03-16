@@ -359,8 +359,10 @@ app.get('/api/stats', (req, res) => {
       ethanNormalizedStrokes: 0,
       dadAverage: 0,
       ethanAverage: 0,
-      bestDadScore: null,
-      bestEthanScore: null,
+      bestDadScore9: null,
+      bestDadScore18: null,
+      bestEthanScore9: null,
+      bestEthanScore18: null,
       firstEthanWin: null,
       recentRounds: rounds.slice(-5).reverse(),
       highlights: {
@@ -458,11 +460,21 @@ app.get('/api/stats', (req, res) => {
         }
       }
 
-      if (!stats.bestDadScore || round.dad_score < stats.bestDadScore.dad_score) {
-        stats.bestDadScore = round;
-      }
-      if (!stats.bestEthanScore || round.ethan_score < stats.bestEthanScore.ethan_score) {
-        stats.bestEthanScore = round;
+      // Track best scores separately for 9-hole and 18-hole rounds
+      if (isNineHoleRound) {
+        if (!stats.bestDadScore9 || round.dad_score < stats.bestDadScore9.dad_score) {
+          stats.bestDadScore9 = round;
+        }
+        if (!stats.bestEthanScore9 || round.ethan_score < stats.bestEthanScore9.ethan_score) {
+          stats.bestEthanScore9 = round;
+        }
+      } else {
+        if (!stats.bestDadScore18 || round.dad_score < stats.bestDadScore18.dad_score) {
+          stats.bestDadScore18 = round;
+        }
+        if (!stats.bestEthanScore18 || round.ethan_score < stats.bestEthanScore18.ethan_score) {
+          stats.bestEthanScore18 = round;
+        }
       }
 
       // Check for "on this day" events (same month/day)
