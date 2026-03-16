@@ -50,12 +50,15 @@ function Dashboard() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <StatCard
-          icon={<Trophy className="w-8 h-8" />}
-          title="Total Rounds"
-          value={stats.totalRounds}
-          color="bg-blue-500"
-        />
+        <Link to="/rounds">
+          <StatCard
+            icon={<Trophy className="w-8 h-8" />}
+            title="Total Rounds"
+            value={stats.totalRounds}
+            color="bg-blue-500"
+            clickable={true}
+          />
+        </Link>
         <StatCard
           icon={<Trophy className="w-8 h-8" />}
           title="Total Holes"
@@ -142,9 +145,18 @@ function Dashboard() {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <Calendar className="w-8 h-8 text-golf-green" />
-          <h2 className="text-2xl font-bold text-gray-800">Recent Rounds</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-8 h-8 text-golf-green" />
+            <h2 className="text-2xl font-bold text-gray-800">Recent Rounds</h2>
+          </div>
+          <Link
+            to="/rounds"
+            className="flex items-center gap-2 text-golf-green hover:text-golf-light font-semibold transition"
+          >
+            <History className="w-5 h-5" />
+            All Rounds
+          </Link>
         </div>
         {stats.recentRounds && stats.recentRounds.length > 0 ? (
           <div className="space-y-3">
@@ -189,9 +201,9 @@ function Dashboard() {
   );
 }
 
-function StatCard({ icon, title, value, color }) {
+function StatCard({ icon, title, value, color, clickable }) {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 transform hover:scale-105 transition">
+    <div className={`bg-white rounded-xl shadow-lg p-6 transform hover:scale-105 transition ${clickable ? 'cursor-pointer' : ''}`}>
       <div className={`${color} w-16 h-16 rounded-full flex items-center justify-center text-white mb-4`}>
         {icon}
       </div>

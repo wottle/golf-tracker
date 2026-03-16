@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Dashboard from './components/Dashboard';
 import AddRound from './components/AddRound';
 import RoundDetail from './components/RoundDetail';
+import AllRounds from './components/AllRounds';
 import Header from './components/Header';
 import Login from './components/Login';
 
@@ -62,6 +63,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+          <Route path="/rounds" element={<AllRounds />} />
           <Route 
             path="/add" 
             element={isAuthenticated ? <AddRound /> : <Navigate to="/login" />} 
