@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  golf-tracker:
+    image: ghcr.io/wottle/golf-tracker:latest
+    container_name: golf-tracker
+    ports:
+      - "3001:3001"
+    volumes:
+      - golf-tracker-uploads:/app/uploads
+      - golf-tracker-db:/app/data
+    environment:
+      - NODE_ENV=production
+      - APP_PASSWORD=${APP_PASSWORD:-golf2024}
+      - SESSION_SECRET=${SESSION_SECRET:-change-this-secret-in-production}
+      - PORT=3001
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=golf-tracker"
+      - "traefik.frontend.rule=Host:${TRAEFIK_HOST:-golf.local}"
+      - "traefik.port=3001"
+      - "traefik.docker.network=traefik"
+
+volumes:
+  golf-tracker-uploads:
+  golf-tracker-db:
+
+networks:
+  traefik:
+    external: true
