@@ -355,6 +355,8 @@ app.get('/api/stats', (req, res) => {
       ties: 0,
       dadTotalStrokes: 0,
       ethanTotalStrokes: 0,
+      dadNormalizedStrokes: 0,
+      ethanNormalizedStrokes: 0,
       dadAverage: 0,
       ethanAverage: 0,
       bestDadScore: null,
@@ -387,12 +389,25 @@ app.get('/api/stats', (req, res) => {
       const hasBothNines = (round.dad_front_nine && round.dad_back_nine) || 
                            (round.ethan_front_nine && round.ethan_back_nine);
       
+      let isNineHoleRound = false;
       if (hasBothNines) {
         stats.totalHoles += 18;
+        isNineHoleRound = false;
       } else if (hasNineHoleData) {
         stats.totalHoles += 9;
+        isNineHoleRound = true;
       } else {
         stats.totalHoles += 18;
+        isNineHoleRound = false;
+      }
+
+      // For averages, normalize 9-hole rounds to 18-hole equivalents
+      if (isNineHoleRound) {
+        stats.dadNormalizedStrokes += round.dad_score * 2;
+        stats.ethanNormalizedStrokes += round.ethan_score * 2;
+      } else {
+        stats.dadNormalizedStrokes += round.dad_score;
+        stats.ethanNormalizedStrokes += round.ethan_score;
       }
 
       const margin = Math.abs(round.dad_score - round.ethan_score);
@@ -475,8 +490,8 @@ app.get('/api/stats', (req, res) => {
     }
 
     if (rounds.length > 0) {
-      stats.dadAverage = (stats.dadTotalStrokes / rounds.length).toFixed(1);
-      stats.ethanAverage = (stats.ethanTotalStrokes / rounds.length).toFixed(1);
+      stats.dadAverage = (stats.dadNormalizedStrokes / rounds.length).toFixed(1);
+      stats.ethanAverage = (stats.ethanNormalizedStrokes / rounds.length).toFixed(1);
     }
 
     res.json(stats);
