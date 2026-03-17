@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ArrowLeft, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Trash2, Edit, Image as ImageIcon } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -97,12 +97,22 @@ function RoundDetail({ isAuthenticated }) {
             )}
           </div>
           {isAuthenticated && (
-            <button
-              onClick={handleDelete}
-              className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50"
-            >
-              <Trash2 className="w-6 h-6" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate(`/edit/${id}`)}
+                className="text-golf-green hover:text-golf-light p-2 rounded-lg hover:bg-green-50"
+                title="Edit Round"
+              >
+                <Edit className="w-6 h-6" />
+              </button>
+              <button
+                onClick={handleDelete}
+                className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50"
+                title="Delete Round"
+              >
+                <Trash2 className="w-6 h-6" />
+              </button>
+            </div>
           )}
         </div>
 

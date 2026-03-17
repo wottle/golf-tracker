@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import AddRound from './components/AddRound';
+import EditRound from './components/EditRound';
 import RoundDetail from './components/RoundDetail';
 import AllRounds from './components/AllRounds';
 import Header from './components/Header';
@@ -67,6 +68,10 @@ function App() {
           <Route 
             path="/add" 
             element={isAuthenticated ? <AddRound /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/edit/:id" 
+            element={isAuthenticated ? <EditRound /> : <Navigate to="/login" />} 
           />
           <Route path="/round/:id" element={<RoundDetail isAuthenticated={isAuthenticated} />} />
         </Routes>
