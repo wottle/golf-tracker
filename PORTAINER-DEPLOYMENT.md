@@ -31,10 +31,20 @@ git push -u origin main
    - Name: `golf-tracker`
    - Build method: **Web editor**
 
-4. **Paste this docker-compose:**
+4. **Create data directory on your NAS:**
+
+```bash
+# SSH into your NAS
+ssh -p 922 wottle@192.168.0.16
+
+# Create the directory structure
+mkdir -p /volume1/docker/golf-tracker/data/uploads
+```
+
+5. **Paste this docker-compose:**
 
 ```yaml
-version: '3.8'
+version: '3.3'
 
 services:
   golf-tracker:
@@ -43,8 +53,8 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - golf-tracker-uploads:/app/uploads
-      - golf-tracker-db:/app/data
+      - /volume1/docker/golf-tracker/data/uploads:/app/uploads
+      - /volume1/docker/golf-tracker/data:/app/data
     environment:
       - NODE_ENV=production
       - APP_PASSWORD=want2run
@@ -60,25 +70,23 @@ services:
       - "traefik.port=3001"
       - "traefik.docker.network=traefik"
 
-volumes:
-  golf-tracker-uploads:
-  golf-tracker-db:
-
 networks:
   traefik:
     external: true
 ```
 
-5. **Configure Environment Variables** (or edit the YAML above):
+**Note**: This configuration uses bind mounts to `/volume1/docker/golf-tracker/data` on your NAS for easy backup and data management.
+
+6. **Configure Environment Variables** (or edit the YAML above):
    - `APP_PASSWORD` - Your secure password
    - `SESSION_SECRET` - Random secret string
    - Update `traefik.frontend.rule` with your domain
 
-6. **Deploy the Stack**
+7. **Deploy the Stack**
    - Click **Deploy the stack**
    - Wait for the image to pull and container to start
 
-7. **Access your app:**
+8. **Access your app:**
    - Via Traefik: `https://golf.yourdomain.com`
    - Direct: `http://nas-ip:3001`
 

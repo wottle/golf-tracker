@@ -7,8 +7,8 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - golf-tracker-uploads:/app/uploads
-      - golf-tracker-db:/app/data
+      - /volume1/docker/golf-tracker/data/uploads:/app/uploads
+      - /volume1/docker/golf-tracker/data:/app/data
     environment:
       - NODE_ENV=production
       - APP_PASSWORD=${APP_PASSWORD:-golf2024}
@@ -23,10 +23,6 @@ services:
       - "traefik.frontend.rule=Host:${TRAEFIK_HOST:-golf.local}"
       - "traefik.port=3001"
       - "traefik.docker.network=traefik"
-
-volumes:
-  golf-tracker-uploads:
-  golf-tracker-db:
 
 networks:
   traefik:

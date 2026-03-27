@@ -153,18 +153,28 @@ Best scores are tracked separately for 9-hole and 18-hole rounds:
 
 ## Data Persistence
 
-### Docker Volumes
+### Docker Volumes (NAS Bind Mounts)
 
-**CRITICAL**: Database and uploads must be persisted via Docker volumes.
+**CRITICAL**: Database and uploads must be persisted via bind mounts to NAS storage.
 
-**Volume Mounts**:
+**Volume Mounts** (Portainer Configuration):
 ```yaml
 volumes:
-  - golf-tracker-uploads:/app/uploads
-  - golf-tracker-db:/app/data
+  - /volume1/docker/golf-tracker/data/uploads:/app/uploads
+  - /volume1/docker/golf-tracker/data:/app/data
 ```
 
-**Database Location**: `/app/data/golf-tracker.db`
+**NAS Directory Structure**:
+```
+/volume1/docker/golf-tracker/
+└── data/
+    ├── golf-tracker.db          # SQLite database
+    └── uploads/
+        ├── scorecards/          # Scorecard images
+        └── photos/              # Round photos
+```
+
+**Database Location**: `/app/data/golf-tracker.db` (maps to `/volume1/docker/golf-tracker/data/golf-tracker.db` on NAS)
 
 **Directory Creation** (`server/index.js` lines 55-59):
 ```javascript
@@ -172,6 +182,15 @@ const dataDir = './data';
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
+```
+
+**Setup on NAS**:
+```bash
+# SSH into NAS
+ssh -p 922 wottle@192.168.0.16
+
+# Create directory structure
+mkdir -p /volume1/docker/golf-tracker/data/uploads
 ```
 
 ## Deployment
@@ -389,16 +408,44 @@ When making changes, verify:
 # SSH into NAS
 ssh -p 922 wottle@192.168.0.16
 
-# Copy database
+# Direct copy from NAS filesystem (recommended)
+cp /volume1/docker/golf-tracker/data/golf-tracker.db ~/backups/golf-tracker-$(date +%Y%m%d).db
+
+# Or via Docker container
 docker cp golf-tracker:/app/data/golf-tracker.db ~/backups/golf-tracker-$(date +%Y%m%d).db
 ```
 
 ### Full Data Backup
 
 ```bash
-# Backup uploads and database
+# SSH into NAS
+ssh -p 922 wottle@192.168.0.16
+
+# Direct backup from NAS filesystem (recommended)
+tar czf ~/backups/golf-tracker-full-$(date +%Y%m%d).tar.gz -C /volume1/docker/golf-tracker data
+
+# Or via Docker container
 docker exec golf-tracker tar czf /tmp/backup.tar.gz /app/data /app/uploads
 docker cp golf-tracker:/tmp/backup.tar.gz ~/backups/golf-tracker-full-$(date +%Y%m%d).tar.gz
+```
+
+### Data Restore
+
+```bash
+# SSH into NAS
+ssh -p 922 wottle@192.168.0.16
+
+# Stop the container
+docker stop golf-tracker
+
+# Restore database
+cp ~/backups/golf-tracker-YYYYMMDD.db /volume1/docker/golf-tracker/data/golf-tracker.db
+
+# Or restore full backup
+tar xzf ~/backups/golf-tracker-full-YYYYMMDD.tar.gz -C /volume1/docker/golf-tracker
+
+# Start the container
+docker start golf-tracker
 ```
 
 ## Future Enhancement Ideas
