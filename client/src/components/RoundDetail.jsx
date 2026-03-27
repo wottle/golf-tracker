@@ -116,40 +116,53 @@ function RoundDetail({ isAuthenticated }) {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className={`rounded-lg p-6 border-4 ${dadWon ? 'bg-green-50 border-green-400' : 'bg-gray-50 border-gray-300'}`}>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Dad</h2>
-            <p className={`text-5xl font-bold mb-4 ${dadWon ? 'text-green-600' : 'text-gray-600'}`}>
-              {round.dad_score}
+        {/* Solo round indicator */}
+        {(!round.dad_score || !round.ethan_score) && (
+          <div className="mb-4 px-4 py-2 bg-blue-50 border-2 border-blue-200 rounded-lg">
+            <p className="text-blue-800 font-semibold">
+              Solo Round - {round.dad_score ? 'Dad' : 'Ethan'}
             </p>
-            {(round.dad_front_nine || round.dad_back_nine) && (
-              <div className="space-y-2 text-gray-700">
-                {round.dad_front_nine && (
-                  <p>Front 9: <span className="font-semibold">{round.dad_front_nine}</span></p>
-                )}
-                {round.dad_back_nine && (
-                  <p>Back 9: <span className="font-semibold">{round.dad_back_nine}</span></p>
-                )}
-              </div>
-            )}
           </div>
+        )}
 
-          <div className={`rounded-lg p-6 border-4 ${ethanWon ? 'bg-purple-50 border-purple-400' : 'bg-gray-50 border-gray-300'}`}>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Ethan</h2>
-            <p className={`text-5xl font-bold mb-4 ${ethanWon ? 'text-purple-600' : 'text-gray-600'}`}>
-              {round.ethan_score}
-            </p>
-            {(round.ethan_front_nine || round.ethan_back_nine) && (
-              <div className="space-y-2 text-gray-700">
-                {round.ethan_front_nine && (
-                  <p>Front 9: <span className="font-semibold">{round.ethan_front_nine}</span></p>
-                )}
-                {round.ethan_back_nine && (
-                  <p>Back 9: <span className="font-semibold">{round.ethan_back_nine}</span></p>
-                )}
-              </div>
-            )}
-          </div>
+        <div className={`grid grid-cols-1 ${round.dad_score && round.ethan_score ? 'md:grid-cols-2' : ''} gap-6 mb-6`}>
+          {round.dad_score && (
+            <div className={`rounded-lg p-6 border-4 ${dadWon ? 'bg-green-50 border-green-400' : 'bg-gray-50 border-gray-300'}`}>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Dad</h2>
+              <p className={`text-5xl font-bold mb-4 ${dadWon ? 'text-green-600' : 'text-gray-600'}`}>
+                {round.dad_score}
+              </p>
+              {(round.dad_front_nine || round.dad_back_nine) && (
+                <div className="space-y-2 text-gray-700">
+                  {round.dad_front_nine && (
+                    <p>Front 9: <span className="font-semibold">{round.dad_front_nine}</span></p>
+                  )}
+                  {round.dad_back_nine && (
+                    <p>Back 9: <span className="font-semibold">{round.dad_back_nine}</span></p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {round.ethan_score && (
+            <div className={`rounded-lg p-6 border-4 ${ethanWon ? 'bg-purple-50 border-purple-400' : 'bg-gray-50 border-gray-300'}`}>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Ethan</h2>
+              <p className={`text-5xl font-bold mb-4 ${ethanWon ? 'text-purple-600' : 'text-gray-600'}`}>
+                {round.ethan_score}
+              </p>
+              {(round.ethan_front_nine || round.ethan_back_nine) && (
+                <div className="space-y-2 text-gray-700">
+                  {round.ethan_front_nine && (
+                    <p>Front 9: <span className="font-semibold">{round.ethan_front_nine}</span></p>
+                  )}
+                  {round.ethan_back_nine && (
+                    <p>Back 9: <span className="font-semibold">{round.ethan_back_nine}</span></p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {tie && (

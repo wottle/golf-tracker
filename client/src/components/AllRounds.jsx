@@ -69,9 +69,10 @@ function AllRounds() {
         ) : (
           <div className="space-y-4">
             {rounds.map((round) => {
-              const dadWon = round.dad_score < round.ethan_score;
-              const ethanWon = round.ethan_score < round.dad_score;
-              const tie = round.dad_score === round.ethan_score;
+              const isSoloRound = !round.dad_score || !round.ethan_score;
+              const dadWon = round.dad_score && round.ethan_score && round.dad_score < round.ethan_score;
+              const ethanWon = round.dad_score && round.ethan_score && round.ethan_score < round.dad_score;
+              const tie = round.dad_score && round.ethan_score && round.dad_score === round.ethan_score;
 
               return (
                 <Link
@@ -89,29 +90,38 @@ function AllRounds() {
                         {round.course_name && (
                           <p className="text-gray-600">{round.course_name}</p>
                         )}
+                        {isSoloRound && (
+                          <p className="text-sm text-blue-600 font-semibold">
+                            Solo - {round.dad_score ? 'Dad' : 'Ethan'}
+                          </p>
+                        )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-8">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600 font-semibold">Dad</p>
-                        <p className={`text-3xl font-bold ${dadWon ? 'text-green-600' : 'text-gray-600'}`}>
-                          {round.dad_score}
-                        </p>
-                      </div>
+                      {round.dad_score && (
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600 font-semibold">Dad</p>
+                          <p className={`text-3xl font-bold ${dadWon ? 'text-green-600' : 'text-gray-600'}`}>
+                            {round.dad_score}
+                          </p>
+                        </div>
+                      )}
 
-                      <div className="text-2xl font-bold text-gray-400">vs</div>
+                      {!isSoloRound && <div className="text-2xl font-bold text-gray-400">vs</div>}
 
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600 font-semibold">Ethan</p>
-                        <p className={`text-3xl font-bold ${ethanWon ? 'text-purple-600' : 'text-gray-600'}`}>
-                          {round.ethan_score}
-                        </p>
-                      </div>
+                      {round.ethan_score && (
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600 font-semibold">Ethan</p>
+                          <p className={`text-3xl font-bold ${ethanWon ? 'text-purple-600' : 'text-gray-600'}`}>
+                            {round.ethan_score}
+                          </p>
+                        </div>
+                      )}
 
-                      {!tie && (
+                      {!tie && !isSoloRound && (
                         <div className="ml-4">
-                          <Trophy className={`w-8 h-8 ${dadWon ? 'text-green-600' : 'text-purple-600'}`} />
+                          <Trophy className={`w-8 h-6 ${dadWon ? 'text-green-600' : 'text-purple-600'}`} />
                         </div>
                       )}
                     </div>

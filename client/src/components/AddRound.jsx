@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || '';
 
 function AddRound() {
   const navigate = useNavigate();
+  const [roundType, setRoundType] = useState('head-to-head'); // 'head-to-head', 'dad-solo', 'ethan-solo'
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     course_name: '',
@@ -58,10 +59,25 @@ function AddRound() {
     setSaving(true);
 
     try {
+      // Prepare data based on round type
+      const submitData = { ...formData };
+      
+      if (roundType === 'dad-solo') {
+        // Clear Ethan's scores for Dad solo rounds
+        submitData.ethan_score = null;
+        submitData.ethan_front_nine = null;
+        submitData.ethan_back_nine = null;
+      } else if (roundType === 'ethan-solo') {
+        // Clear Dad's scores for Ethan solo rounds
+        submitData.dad_score = null;
+        submitData.dad_front_nine = null;
+        submitData.dad_back_nine = null;
+      }
+
       const response = await fetch(`${API_URL}/api/rounds`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
 
       const result = await response.json();
@@ -100,6 +116,47 @@ function AddRound() {
         <h2 className="text-3xl font-bold text-gray-800 mb-6">Add New Round</h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-gray-50 rounded-lg p-4 border-2 border-gray-300">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Round Type
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setRoundType('head-to-head')}
+                className={`px-4 py-3 rounded-lg font-semibold transition ${
+                  roundType === 'head-to-head'
+                    ? 'bg-golf-green text-white'
+                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-golf-light'
+                }`}
+              >
+                Head-to-Head
+              </button>
+              <button
+                type="button"
+                onClick={() => setRoundType('dad-solo')}
+                className={`px-4 py-3 rounded-lg font-semibold transition ${
+                  roundType === 'dad-solo'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-green-400'
+                }`}
+              >
+                Dad Solo
+              </button>
+              <button
+                type="button"
+                onClick={() => setRoundType('ethan-solo')}
+                className={`px-4 py-3 rounded-lg font-semibold transition ${
+                  roundType === 'ethan-solo'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-purple-400'
+                }`}
+              >
+                Ethan Solo
+              </button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -138,96 +195,108 @@ function AddRound() {
 
           <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
             <h3 className="text-xl font-bold text-green-800 mb-4">Final Scores</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Dad's Score
-                </label>
-                <input
-                  type="number"
-                  name="dad_score"
-                  value={formData.dad_score}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none text-lg font-bold"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Ethan's Score
-                </label>
-                <input
-                  type="number"
-                  name="ethan_score"
-                  value={formData.ethan_score}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none text-lg font-bold"
-                />
-              </div>
+            <div className={`grid ${roundType === 'head-to-head' ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
+              {(roundType === 'head-to-head' || roundType === 'dad-solo') && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Dad's Score
+                  </label>
+                  <input
+                    type="number"
+                    name="dad_score"
+                    value={formData.dad_score}
+                    onChange={handleChange}
+                    required={roundType !== 'ethan-solo'}
+                    min="0"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none text-lg font-bold"
+                  />
+                </div>
+              )}
+              {(roundType === 'head-to-head' || roundType === 'ethan-solo') && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Ethan's Score
+                  </label>
+                  <input
+                    type="number"
+                    name="ethan_score"
+                    value={formData.ethan_score}
+                    onChange={handleChange}
+                    required={roundType !== 'dad-solo'}
+                    min="0"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none text-lg font-bold"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
           <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
             <h3 className="text-xl font-bold text-blue-800 mb-4">9-Hole Scores (Optional)</h3>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Dad's Front 9
-                  </label>
-                  <input
-                    type="number"
-                    name="dad_front_nine"
-                    value={formData.dad_front_nine}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Ethan's Front 9
-                  </label>
-                  <input
-                    type="number"
-                    name="ethan_front_nine"
-                    value={formData.ethan_front_nine}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
-                  />
-                </div>
+              <div className={`grid ${roundType === 'head-to-head' ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
+                {(roundType === 'head-to-head' || roundType === 'dad-solo') && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Dad's Front 9
+                    </label>
+                    <input
+                      type="number"
+                      name="dad_front_nine"
+                      value={formData.dad_front_nine}
+                      onChange={handleChange}
+                      min="0"
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
+                    />
+                  </div>
+                )}
+                {(roundType === 'head-to-head' || roundType === 'ethan-solo') && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Ethan's Front 9
+                    </label>
+                    <input
+                      type="number"
+                      name="ethan_front_nine"
+                      value={formData.ethan_front_nine}
+                      onChange={handleChange}
+                      min="0"
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
+                    />
+                  </div>
+                )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Dad's Back 9
-                  </label>
-                  <input
-                    type="number"
-                    name="dad_back_nine"
-                    value={formData.dad_back_nine}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Ethan's Back 9
-                  </label>
-                  <input
-                    type="number"
-                    name="ethan_back_nine"
-                    value={formData.ethan_back_nine}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
-                  />
-                </div>
+              <div className={`grid ${roundType === 'head-to-head' ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
+                {(roundType === 'head-to-head' || roundType === 'dad-solo') && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Dad's Back 9
+                    </label>
+                    <input
+                      type="number"
+                      name="dad_back_nine"
+                      value={formData.dad_back_nine}
+                      onChange={handleChange}
+                      min="0"
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
+                    />
+                  </div>
+                )}
+                {(roundType === 'head-to-head' || roundType === 'ethan-solo') && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Ethan's Back 9
+                    </label>
+                    <input
+                      type="number"
+                      name="ethan_back_nine"
+                      value={formData.ethan_back_nine}
+                      onChange={handleChange}
+                      min="0"
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-golf-light focus:outline-none"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

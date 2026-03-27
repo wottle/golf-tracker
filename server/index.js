@@ -73,8 +73,8 @@ function initDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       date TEXT NOT NULL,
       course_name TEXT,
-      dad_score INTEGER NOT NULL,
-      ethan_score INTEGER NOT NULL,
+      dad_score INTEGER,
+      ethan_score INTEGER,
       dad_front_nine INTEGER,
       ethan_front_nine INTEGER,
       dad_back_nine INTEGER,
@@ -363,6 +363,8 @@ app.get('/api/stats', (req, res) => {
       ethanTotalStrokes: 0,
       dadNormalizedStrokes: 0,
       ethanNormalizedStrokes: 0,
+      dadRoundCount: 0,
+      ethanRoundCount: 0,
       dadAverage: 0,
       ethanAverage: 0,
       bestDadScore9: null,
@@ -388,8 +390,18 @@ app.get('/api/stats', (req, res) => {
     let biggestMargin = 0;
 
     rounds.forEach((round, index) => {
-      stats.dadTotalStrokes += round.dad_score;
-      stats.ethanTotalStrokes += round.ethan_score;
+      // Check if this is a solo round or head-to-head
+      const isSoloRound = !round.dad_score || !round.ethan_score;
+      
+      // Add scores to totals (only if not null)
+      if (round.dad_score) {
+        stats.dadTotalStrokes += round.dad_score;
+        stats.dadRoundCount++;
+      }
+      if (round.ethan_score) {
+        stats.ethanTotalStrokes += round.ethan_score;
+        stats.ethanRoundCount++;
+      }
 
       // Calculate holes played (9 or 18)
       const hasNineHoleData = round.dad_front_nine || round.ethan_front_nine || 
@@ -411,28 +423,41 @@ app.get('/api/stats', (req, res) => {
 
       // For averages, normalize 9-hole rounds to 18-hole equivalents
       if (isNineHoleRound) {
-        stats.dadNormalizedStrokes += round.dad_score * 2;
-        stats.ethanNormalizedStrokes += round.ethan_score * 2;
-      } else {
-        stats.dadNormalizedStrokes += round.dad_score;
-        stats.ethanNormalizedStrokes += round.ethan_score;
-      }
-
-      const margin = Math.abs(round.dad_score - round.ethan_score);
-      let winner = null;
-
-      if (round.dad_score < round.ethan_score) {
-        stats.dadWins++;
-        winner = 'dad';
-      } else if (round.ethan_score < round.dad_score) {
-        stats.ethanWins++;
-        winner = 'ethan';
-        if (!stats.firstEthanWin) {
-          stats.firstEthanWin = round;
+        if (round.dad_score) {
+          stats.dadNormalizedStrokes += round.dad_score * 2;
+        }
+        if (round.ethan_score) {
+          stats.ethanNormalizedStrokes += round.ethan_score * 2;
         }
       } else {
-        stats.ties++;
-        winner = 'tie';
+        if (round.dad_score) {
+          stats.dadNormalizedStrokes += round.dad_score;
+        }
+        if (round.ethan_score) {
+          stats.ethanNormalizedStrokes += round.ethan_score;
+        }
+      }
+
+      // Only calculate winner for head-to-head rounds
+      let winner = null;
+      let margin = 0;
+
+      if (!isSoloRound) {
+        margin = Math.abs(round.dad_score - round.ethan_score);
+        
+        if (round.dad_score < round.ethan_score) {
+          stats.dadWins++;
+          winner = 'dad';
+        } else if (round.ethan_score < round.dad_score) {
+          stats.ethanWins++;
+          winner = 'ethan';
+          if (!stats.firstEthanWin) {
+            stats.firstEthanWin = round;
+          }
+        } else {
+          stats.ties++;
+          winner = 'tie';
+        }
       }
 
       // Track streaks
@@ -507,9 +532,11 @@ app.get('/api/stats', (req, res) => {
       };
     }
 
-    if (rounds.length > 0) {
-      stats.dadAverage = (stats.dadNormalizedStrokes / rounds.length).toFixed(1);
-      stats.ethanAverage = (stats.ethanNormalizedStrokes / rounds.length).toFixed(1);
+    if (stats.dadRoundCount > 0) {
+      stats.dadAverage = (stats.dadNormalizedStrokes / stats.dadRoundCount).toFixed(1);
+    }
+    if (stats.ethanRoundCount > 0) {
+      stats.ethanAverage = (stats.ethanNormalizedStrokes / stats.ethanRoundCount).toFixed(1);
     }
 
     res.json(stats);
