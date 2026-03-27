@@ -214,19 +214,37 @@ function Dashboard() {
                     {round.course_name && (
                       <p className="text-sm text-gray-600">{round.course_name}</p>
                     )}
+                    {(!round.dad_score || !round.ethan_score) && (
+                      <p className="text-sm text-blue-600 font-semibold">
+                        Solo - {round.dad_score ? 'Dad' : 'Ethan'}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold">
-                      <span className={round.dad_score < round.ethan_score ? 'text-green-600' : 'text-gray-600'}>
-                        Dad: {round.dad_score}
-                      </span>
-                      {' vs '}
-                      <span className={round.ethan_score < round.dad_score ? 'text-purple-600' : 'text-gray-600'}>
-                        Ethan: {round.ethan_score}
-                      </span>
-                    </p>
-                    {round.dad_score === round.ethan_score && (
-                      <p className="text-sm text-yellow-600 font-semibold">Tie!</p>
+                    {round.dad_score && round.ethan_score ? (
+                      <>
+                        <p className="text-lg font-bold">
+                          <span className={round.dad_score < round.ethan_score ? 'text-green-600' : 'text-gray-600'}>
+                            Dad: {round.dad_score}
+                          </span>
+                          {' vs '}
+                          <span className={round.ethan_score < round.dad_score ? 'text-purple-600' : 'text-gray-600'}>
+                            Ethan: {round.ethan_score}
+                          </span>
+                        </p>
+                        {round.dad_score === round.ethan_score && (
+                          <p className="text-sm text-yellow-600 font-semibold">Tie!</p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-lg font-bold">
+                        {round.dad_score && (
+                          <span className="text-green-600">Dad: {round.dad_score}</span>
+                        )}
+                        {round.ethan_score && (
+                          <span className="text-purple-600">Ethan: {round.ethan_score}</span>
+                        )}
+                      </p>
                     )}
                   </div>
                 </div>
