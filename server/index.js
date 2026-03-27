@@ -95,6 +95,74 @@ function initDatabase() {
       FOREIGN KEY (round_id) REFERENCES rounds(id) ON DELETE CASCADE
     )
   `);
+
+  // Migration: Make score columns nullable for existing databases
+  db.get("PRAGMA table_info(rounds)", (err, row) => {
+    if (err) {
+      console.error('Error checking table schema:', err);
+      return;
+    }
+    
+    // Check if migration is needed by looking at existing schema
+    db.all("PRAGMA table_info(rounds)", (err, columns) => {
+      if (err) {
+        console.error('Error reading table info:', err);
+        return;
+      }
+      
+      const dadScoreCol = columns.find(col => col.name === 'dad_score');
+      const ethanScoreCol = columns.find(col => col.name === 'ethan_score');
+      
+      // If columns exist and are NOT NULL, we need to migrate
+      if (dadScoreCol && dadScoreCol.notnull === 1) {
+        console.log('Migrating database schema to support solo rounds...');
+        
+        db.serialize(() => {
+          // SQLite doesn't support ALTER COLUMN, so we need to recreate the table
+          db.run('BEGIN TRANSACTION');
+          
+          // Create new table with nullable scores
+          db.run(`
+            CREATE TABLE rounds_new (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              date TEXT NOT NULL,
+              course_name TEXT,
+              dad_score INTEGER,
+              ethan_score INTEGER,
+              dad_front_nine INTEGER,
+              ethan_front_nine INTEGER,
+              dad_back_nine INTEGER,
+              ethan_back_nine INTEGER,
+              scorecard_image TEXT,
+              notes TEXT,
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+          `);
+          
+          // Copy data from old table
+          db.run(`
+            INSERT INTO rounds_new 
+            SELECT * FROM rounds
+          `);
+          
+          // Drop old table
+          db.run('DROP TABLE rounds');
+          
+          // Rename new table
+          db.run('ALTER TABLE rounds_new RENAME TO rounds');
+          
+          db.run('COMMIT', (err) => {
+            if (err) {
+              console.error('Migration failed:', err);
+              db.run('ROLLBACK');
+            } else {
+              console.log('✅ Database migration completed successfully');
+            }
+          });
+        });
+      }
+    });
+  });
 }
 
 // Authentication middleware
