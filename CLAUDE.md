@@ -160,21 +160,23 @@ Best scores are tracked separately for 9-hole and 18-hole rounds:
 **Volume Mounts** (Portainer Configuration):
 ```yaml
 volumes:
-  - /volume1/docker/golf-tracker/data/uploads:/app/uploads
+  - /volume1/docker/golf-tracker/uploads:/app/uploads
   - /volume1/docker/golf-tracker/data:/app/data
 ```
 
 **NAS Directory Structure**:
 ```
 /volume1/docker/golf-tracker/
-└── data/
-    ├── golf-tracker.db          # SQLite database
-    └── uploads/
-        ├── scorecards/          # Scorecard images
-        └── photos/              # Round photos
+├── data/
+│   └── golf-tracker.db          # SQLite database
+└── uploads/
+    ├── scorecards/              # Scorecard images
+    └── photos/                  # Round photos
 ```
 
 **Database Location**: `/app/data/golf-tracker.db` (maps to `/volume1/docker/golf-tracker/data/golf-tracker.db` on NAS)
+
+**Uploads Location**: `/app/uploads/` (maps to `/volume1/docker/golf-tracker/uploads/` on NAS)
 
 **Directory Creation** (`server/index.js` lines 55-59):
 ```javascript
@@ -190,7 +192,8 @@ if (!fs.existsSync(dataDir)) {
 ssh -p 922 wottle@192.168.0.16
 
 # Create directory structure
-mkdir -p /volume1/docker/golf-tracker/data/uploads
+mkdir -p /volume1/docker/golf-tracker/data
+mkdir -p /volume1/docker/golf-tracker/uploads
 ```
 
 ## Deployment
@@ -422,7 +425,7 @@ docker cp golf-tracker:/app/data/golf-tracker.db ~/backups/golf-tracker-$(date +
 ssh -p 922 wottle@192.168.0.16
 
 # Direct backup from NAS filesystem (recommended)
-tar czf ~/backups/golf-tracker-full-$(date +%Y%m%d).tar.gz -C /volume1/docker/golf-tracker data
+tar czf ~/backups/golf-tracker-full-$(date +%Y%m%d).tar.gz -C /volume1/docker golf-tracker
 
 # Or via Docker container
 docker exec golf-tracker tar czf /tmp/backup.tar.gz /app/data /app/uploads
@@ -438,11 +441,11 @@ ssh -p 922 wottle@192.168.0.16
 # Stop the container
 docker stop golf-tracker
 
-# Restore database
+# Restore database only
 cp ~/backups/golf-tracker-YYYYMMDD.db /volume1/docker/golf-tracker/data/golf-tracker.db
 
-# Or restore full backup
-tar xzf ~/backups/golf-tracker-full-YYYYMMDD.tar.gz -C /volume1/docker/golf-tracker
+# Or restore full backup (includes database and uploads)
+tar xzf ~/backups/golf-tracker-full-YYYYMMDD.tar.gz -C /volume1/docker
 
 # Start the container
 docker start golf-tracker

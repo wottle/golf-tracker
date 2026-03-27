@@ -7,7 +7,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - /volume1/docker/golf-tracker/data/uploads:/app/uploads
+      - /volume1/docker/golf-tracker/uploads:/app/uploads
       - /volume1/docker/golf-tracker/data:/app/data
     environment:
       - NODE_ENV=production

@@ -31,14 +31,15 @@ git push -u origin main
    - Name: `golf-tracker`
    - Build method: **Web editor**
 
-4. **Create data directory on your NAS:**
+4. **Create data directories on your NAS:**
 
 ```bash
 # SSH into your NAS
 ssh -p 922 wottle@192.168.0.16
 
 # Create the directory structure
-mkdir -p /volume1/docker/golf-tracker/data/uploads
+mkdir -p /volume1/docker/golf-tracker/data
+mkdir -p /volume1/docker/golf-tracker/uploads
 ```
 
 5. **Paste this docker-compose:**
@@ -53,7 +54,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - /volume1/docker/golf-tracker/data/uploads:/app/uploads
+      - /volume1/docker/golf-tracker/uploads:/app/uploads
       - /volume1/docker/golf-tracker/data:/app/data
     environment:
       - NODE_ENV=production
@@ -75,7 +76,7 @@ networks:
     external: true
 ```
 
-**Note**: This configuration uses bind mounts to `/volume1/docker/golf-tracker/data` on your NAS for easy backup and data management.
+**Note**: This configuration uses bind mounts to `/volume1/docker/golf-tracker/` on your NAS for easy backup and data management. Database is stored in `data/` and uploads in `uploads/`.
 
 6. **Configure Environment Variables** (or edit the YAML above):
    - `APP_PASSWORD` - Your secure password
